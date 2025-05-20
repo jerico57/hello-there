@@ -32,6 +32,10 @@
     <div class="center-container">
         <h1>Hello there!</h1>
         <div id="clock"></div>
+        <input type="file" id="photoInput" accept="image/*" style="margin-top: 20px; color: white;" />
+        <img id="photoPreview" style="display:none; margin-top: 20px; max-width: 300px; border-radius: 8px;" />
+        <button id="getDayBtn" style="margin-top: 20px;">Get Current Day</button>
+        <div id="currentDay" style="color: #00ffea; margin-top: 10px;"></div>
     </div>
     <script>
         function updateClock() {
@@ -43,6 +47,30 @@
         }
         setInterval(updateClock, 1000);
         updateClock(); // initial call
+
+        // Photo upload preview
+        const photoInput = document.getElementById('photoInput');
+        const photoPreview = document.getElementById('photoPreview');
+        photoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                photoPreview.src = '';
+                photoPreview.style.display = 'none';
+            }
+        });
+
+        document.getElementById('getDayBtn').addEventListener('click', async () => {
+            const response = await fetch('http://localhost:3001/current-day');
+            const data = await response.json();
+            document.getElementById('currentDay').textContent = `Today is: ${data.day}`;
+        });
     </script>
 </body>
 </html>
